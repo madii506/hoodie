@@ -170,10 +170,7 @@
   <a class="brand" href="#"><canvas id="navlogo" width="24" height="26" aria-hidden="true"></canvas>hoodie</a>
   <div class="navlinks"><a href="#gen">Put it on</a><a href="#mint">Mint</a><a href="#market">Marketplace</a><a href="#wardrobe">Wardrobe</a><a href="#token">Token</a><a href="#buy">Buy</a><a href="#faq">FAQ</a></div>
   <div class="cta">
-    <a class="mode" href="#faq" title="Mints and purchases are simulated until the contract is live" style="text-decoration:none">preview mode</a>
-    <div class="wallet" id="wallet" hidden><span class="e">Ξ <b id="balEth">0.000</b></span><span class="h"><b id="balHood">0</b> $HOODIE</span></div>
-    <button class="btn sm" id="connectBtn">Connect wallet</button>
-    <a class="btn sm acid" id="buyLink" href="#buy">Buy $HOODIE</a>
+        <div class="wallet" id="wallet" hidden><span class="e">Ξ <b id="balEth">0.000</b></span><span class="h"><b id="balHood">0</b> $HOODIE</span></div>
   </div>
 </nav>
 <div class="tape"><div id="tape"></div></div>
@@ -185,7 +182,6 @@
     <p class="lede">An empty green hoodie on Robinhood Chain. Nobody inside. Everybody inside. Mint your own, dress it from the marketplace, put it on your PFP. Hold $HOODIE and creator fees are paid to holders in ETH. The hoodie has pockets.</p>
     <div class="badges"><span class="badge">Hold on RH</span><span class="badge y">Fees paid in ETH</span><span class="badge w">Nobody inside</span></div>
     <div class="cta"><a class="btn acid" href="#mint">Mint a hoodie</a><button class="btn" id="scrollGen">Put the hoodie on →</button></div>
-    <div class="ca"><span>CA</span><b id="caText">drops at launch</b><button class="btn sm" id="copyCa">copy</button></div>
     <div class="stats"><div><b id="stMint">0</b>hoodies minted here</div><div><b id="stItems">0</b>items in your closet</div><div><b id="stWear">0</b>PFPs dressed</div></div>
   </div>
 
@@ -290,7 +286,7 @@
 (function(){
 const $=s=>document.querySelector(s);
 const CONFIG={x:'https://x.com/',pool:'https://app.uniswap.org/',chart:'https://dexscreener.com/',ca:''};
-if(CONFIG.ca){$('#caText').textContent=CONFIG.ca;$('#caText2').textContent=CONFIG.ca}
+if(CONFIG.ca){$('#caText2').textContent=CONFIG.ca}
 $('#xLink').href=CONFIG.x;$('#buyLink2').href=CONFIG.pool;$('#chartLink').href=CONFIG.chart;
 [['#buyLink2','Pool link goes live with the CA — opening Uniswap'],['#chartLink','Chart goes live with the CA — opening DexScreener']].forEach(([id,m])=>$(id).addEventListener('click',()=>{if(!CONFIG.ca)toast(m)}));
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2300)}
@@ -357,9 +353,8 @@ let state={connected:false,addr:'',eth:0,hood:0,minted:[],owned:[],wearing:null,
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.minted)state={...state,...s}}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
 function wearing(){return state.minted.find(h=>h.num===state.wearing)||null}
-function renderWallet(){$('#balEth').textContent=state.eth.toFixed(3);$('#balHood').textContent=fmt(state.hood);$('#connectBtn').textContent=state.connected?state.addr:'Connect wallet';const w=$('#wallet');w.classList.remove('pop');void w.offsetWidth;w.classList.add('pop');$('#stMint').textContent=state.minted.length;$('#stItems').textContent=state.owned.length;$('#stWear').textContent=state.dressed}
-function needWallet(){if(!state.connected){toast('Connect a wallet first');$('#connectBtn').scrollIntoView({block:'center'});return true}return false}
-$('#connectBtn').addEventListener('click',()=>{if(state.connected){state.connected=false;renderWallet();save();toast('Wallet disconnected');return}const a='0123456789abcdef';let s='0x';for(let i=0;i<6;i++)s+=a[Math.random()*16|0];state.addr=s+'…'+a[Math.random()*16|0]+a[Math.random()*16|0];state.connected=true;if(state.eth===0&&state.hood===0){state.eth=0.5;state.hood=250000;toast('Preview wallet: Ξ 0.500 + 250,000 $HOODIE loaded')}else toast('Wallet connected');renderWallet();save();burstAt($('#wallet'))});
+function renderWallet(){$('#balEth').textContent=state.eth.toFixed(3);$('#balHood').textContent=fmt(state.hood);const w=$('#wallet');w.classList.remove('pop');void w.offsetWidth;w.classList.add('pop');$('#stMint').textContent=state.minted.length;$('#stItems').textContent=state.owned.length;$('#stWear').textContent=state.dressed}
+function needWallet(){if(!state.connected){state.connected=true;if(state.eth===0&&state.hood===0){state.eth=0.5;state.hood=250000}save()}return false}
 
 /* ---------- mint ---------- */
 const mcv=$('#mintcv'),mctx=mcv.getContext('2d');let current=null,rolling=false;
@@ -386,7 +381,7 @@ function renderMarket(){const w=wearing();$('#marketGrid').innerHTML=Object.entr
   return `<div class="item ${owned?'owned':''} ${eq?'eq':''}"><canvas width="24" height="28" data-item="${k}"></canvas><div class="n">${it.n}</div><div class="r" style="color:${RCOL[it.r]}">${it.r}</div><p>${it.d}</p><div class="p">Ξ ${it.p.toFixed(3)}</div><div class="actions">${owned?`<button class="btn xs ${eq?'':'acid'}" data-eq="${k}">${eq?'Unequip':'Equip'}</button><button class="btn xs" data-sell="${k}">Sell ½</button>`:`<button class="btn xs acid" data-buy="${k}">Buy</button>`}</div></div>`}).join('');
   document.querySelectorAll('#marketGrid canvas').forEach(c=>{const g=c.getContext('2d');g.fillStyle='#000';g.fillRect(0,0,24,28);drawHoodie(g,0,3,1,{color:'green',pattern:'none',strings:'white',pocket:'kangaroo',inside:'eyes',items:[c.dataset.item]})})}
 $('#marketGrid').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.buy){if(needWallet())return;const it=ITEMS[b.dataset.buy];if(state.eth<it.p){toast(`Need Ξ ${it.p.toFixed(3)} — connect or top up`);return}state.eth-=it.p;state.owned.push(b.dataset.buy);const w=wearing();if(w&&!w.items.includes(b.dataset.buy))w.items.push(b.dataset.buy);burstAt(b);toast(`Bought ${it.n} for Ξ ${it.p.toFixed(3)}${w?' · equipped':''}`)}
+  if(b.dataset.buy){if(needWallet())return;const it=ITEMS[b.dataset.buy];if(state.eth<it.p){toast(`Need Ξ ${it.p.toFixed(3)}`);return}state.eth-=it.p;state.owned.push(b.dataset.buy);const w=wearing();if(w&&!w.items.includes(b.dataset.buy))w.items.push(b.dataset.buy);burstAt(b);toast(`Bought ${it.n} for Ξ ${it.p.toFixed(3)}${w?' · equipped':''}`)}
   if(b.dataset.eq){const w=wearing();if(!w){toast('Mint a hoodie first');return}const k=b.dataset.eq;if(w.items.includes(k))w.items=w.items.filter(x=>x!==k);else w.items.push(k);toast(w.items.includes(k)?'Equipped':'Unequipped')}
   if(b.dataset.sell){const k=b.dataset.sell;state.owned=state.owned.filter(x=>x!==k);state.minted.forEach(h=>h.items=h.items.filter(x=>x!==k||h.drop===k));state.eth+=ITEMS[k].p/2;toast(`Sold ${ITEMS[k].n} for Ξ ${(ITEMS[k].p/2).toFixed(3)}`)}
   renderAll();render()});
@@ -431,7 +426,6 @@ $('#dl').addEventListener('click',()=>{const a=document.createElement('a');a.dow
 $('#tweet').addEventListener('click',()=>{const w=wearing();const t=encodeURIComponent(`put the hoodie on. nobody inside. everybody inside.${w?` wearing hoodie #${w.num} (${rarityOf(w)[1]}).`:''}\n\n$HOODIE 🟢 `+location.origin);window.open('https://x.com/intent/tweet?text='+t,'_blank')});
 $('#reset').addEventListener('click',()=>{st.img=null;st.ox=st.oy=0;st.zoom=100;$('#zoom').value=100;$('#drop').hidden=false;render()});
 $('#scrollGen').addEventListener('click',()=>{$('#stage').scrollIntoView({behavior:'smooth',block:'center'});$('#file').click()});
-$('#copyCa').addEventListener('click',()=>{const t=$('#caText').textContent;if(t.startsWith('drops')){toast('CA drops at launch — follow our X');return}navigator.clipboard?.writeText(t).then(()=>toast('CA copied'))});
 
 function renderAll(){renderWallet();renderMarket();renderWardrobe();save()}
 $('#tape').innerHTML=Array(2).fill('$HOODIE · robinhood chain · nobody inside · everybody inside · mint a hoodie · dress it · wear it · the hoodie has pockets · ').map(s=>`<span>${s}</span>`).join('');
