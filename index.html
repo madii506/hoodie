@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>hoodie</title>
+<meta name="description" content="hoodie — an empty green hoodie on Robinhood Chain. Mint your hoodie, dress it from the marketplace, put it on your PFP. Hold $HOODIE, fees paid in ETH.">
+<meta property="og:title" content="hoodie — everyone in the hood wears one.">
+<meta property="og:description" content="Mint a hoodie. Dress it. Wear it. Hold $HOODIE on RH, fees paid in ETH.">
+<meta property="og:image" content="banner.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap">
+<style>
+  @font-face{font-family:'Silkscreen';font-weight:700;font-display:swap;src:url(assets/silkscreen-latin-700-normal.woff2) format('woff2')}
+  @font-face{font-family:'Silkscreen';font-weight:400;font-display:swap;src:url(assets/silkscreen-latin-400-normal.woff2) format('woff2')}
+  @font-face{font-family:'VT323';font-weight:400;font-display:swap;src:url(assets/vt323-latin-400-normal.woff2) format('woff2')}
+  :root{--bg:#06100a;--panel:#0b1a10;--panel2:#10241a;--line:#1d3a27;--line2:#2c5a3a;--text:#eef5ef;--muted:#8fb39a;--dim:#4f7a5e;--green:#22c55e;--acid:#b8ff3d;--yellow:#ffd23f;--pink:#ff4fd8;--pixel:'Silkscreen',monospace;--term:'VT323',monospace}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:15px;line-height:1.55;padding-inline:clamp(16px,4vw,48px);padding-block:0 60px;overflow-x:hidden}
+  body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 2px,transparent 2px 4px);pointer-events:none;z-index:0}
+  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto}
+  a{color:inherit}button{font:inherit;color:inherit;cursor:pointer}[hidden]{display:none!important}
+  canvas{image-rendering:pixelated}
+  .px{font-family:var(--pixel)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border:3px solid var(--line2);background:var(--panel2);color:var(--text);font-family:var(--pixel);font-size:12px;text-transform:uppercase;text-decoration:none;box-shadow:4px 4px 0 #000;transition:transform .08s;white-space:nowrap}
+  .btn:hover{border-color:var(--acid)}.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
+  .btn.acid{background:var(--acid);color:#06100a;border-color:var(--acid)}.btn.acid:hover{background:#d4ff7a}
+  .btn.sm{padding:8px 12px;font-size:10px;box-shadow:3px 3px 0 #000}.btn.xs{padding:5px 9px;font-size:9px;box-shadow:2px 2px 0 #000}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  nav{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-block:14px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--pixel);font-weight:700;font-size:18px;color:var(--acid);text-decoration:none;text-shadow:2px 2px 0 #000}
+  .brand canvas{width:30px;height:auto;image-rendering:pixelated}
+  .navlinks{display:flex;gap:16px;font-family:var(--term);font-size:20px;color:var(--muted);flex-wrap:wrap}
+  .navlinks a{text-decoration:none}.navlinks a:hover{color:var(--text)}
+  @media(max-width:860px){.navlinks{display:none}}
+  .wallet{display:flex;align-items:center;gap:8px;font-family:var(--term);font-size:19px;border:3px solid var(--line2);background:#000;padding:6px 10px;flex-wrap:wrap}
+  .wallet .e{color:#8ab4ff}.wallet .h{color:var(--acid)}.wallet small{font-family:var(--pixel);font-size:8px;color:var(--muted);text-transform:uppercase}
+  .wallet.pop{animation:pop .4s}@keyframes pop{30%{transform:scale(1.08)}}
+  .mode{font-family:var(--pixel);font-size:9px;text-transform:uppercase;color:var(--yellow);border:2px solid rgba(255,210,63,.5);padding:4px 8px}
+  .tape{border-block:3px solid var(--acid);background:#000;overflow:hidden;margin-bottom:26px}
+  .tape div{display:flex;gap:40px;width:max-content;padding:8px 0;font-family:var(--pixel);font-size:11px;color:var(--acid);text-transform:uppercase;animation:tape 40s linear infinite}
+  @keyframes tape{to{transform:translateX(-50%)}}
+
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center}
+  @media(max-width:900px){.hero{grid-template-columns:1fr}}
+  h1{font-family:var(--pixel);font-weight:700;font-size:clamp(40px,8vw,96px);line-height:.95;margin:0 0 10px;color:var(--acid);text-shadow:4px 4px 0 #000,0 0 40px rgba(184,255,61,.25)}
+  .tag{font-family:var(--term);font-size:clamp(24px,3vw,34px);color:var(--text);margin:0 0 14px}
+  .lede{color:var(--muted);max-width:52ch;margin:0 0 18px;font-size:16px}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+  .badge{font-family:var(--pixel);font-size:10px;text-transform:uppercase;padding:8px 12px;border:3px solid var(--green);color:var(--green);background:#000}
+  .badge.y{border-color:var(--yellow);color:var(--yellow)}.badge.w{border-color:var(--text);color:var(--text)}
+  .cta{display:flex;flex-wrap:wrap;gap:10px}
+  .ca{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:16px;padding:8px 8px 8px 14px;border:3px solid var(--line2);background:#000;font-family:var(--term);font-size:20px;color:var(--muted)}
+  .ca b{color:var(--yellow);font-weight:400;overflow-wrap:anywhere}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+  .stats div{border:3px solid var(--line2);background:var(--panel);padding:10px 12px;font-family:var(--term);font-size:19px;color:var(--muted)}
+  .stats b{display:block;font-family:var(--pixel);font-size:16px;color:var(--acid)}
+
+  .gen{border:3px solid var(--line2);background:var(--panel);box-shadow:8px 8px 0 #000;padding:16px;display:grid;gap:12px}
+  .ph{display:flex;justify-content:space-between;align-items:center;font-family:var(--pixel);font-size:11px;text-transform:uppercase;color:var(--muted);gap:8px;flex-wrap:wrap}
+  .stage{position:relative;aspect-ratio:1;background:#000;border:3px solid var(--line);overflow:hidden;touch-action:none;cursor:grab}
+  .stage:active{cursor:grabbing}.stage canvas{width:100%;height:100%;display:block}
+  .drop{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;background:rgba(6,16,10,.72);font-family:var(--term);font-size:22px;color:var(--text);cursor:pointer;transition:.15s}
+  .drop.over{background:rgba(184,255,61,.18);outline:3px dashed var(--acid);outline-offset:-12px}
+  .drop b{font-family:var(--pixel);font-size:12px;color:var(--acid);display:block;margin-bottom:8px}
+  .drop small{display:block;color:var(--muted);font-size:18px;margin-top:6px}
+  .ctrls{display:grid;gap:10px}
+  .ctrl{display:grid;grid-template-columns:90px 1fr;align-items:center;gap:10px;font-family:var(--pixel);font-size:9px;text-transform:uppercase;color:var(--muted)}
+  input[type=range]{width:100%;accent-color:var(--acid);height:6px}
+  .toggles{display:flex;gap:8px;flex-wrap:wrap}
+  .tg{font-family:var(--pixel);font-size:9px;text-transform:uppercase;padding:7px 10px;border:3px solid var(--line2);background:#000;color:var(--muted)}
+  .tg.on{border-color:var(--acid);color:var(--acid)}
+  .actions{display:flex;flex-wrap:wrap;gap:8px}
+
+  section{margin-top:72px}
+  .eyebrow{font-family:var(--pixel);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--acid);margin:0 0 8px}
+  h2{font-family:var(--pixel);font-weight:700;font-size:clamp(22px,3.5vw,36px);margin:0 0 10px;text-shadow:3px 3px 0 #000;line-height:1.1}
+  .sub{color:var(--muted);max-width:64ch;margin:0 0 20px}
+  .box{border:3px solid var(--line2);background:var(--panel);padding:20px;box-shadow:5px 5px 0 #000}
+
+  /* mint */
+  .mint{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start}
+  @media(max-width:860px){.mint{grid-template-columns:1fr}}
+  .mintstage{aspect-ratio:1;background:#000;border:3px solid var(--line);position:relative;overflow:hidden}
+  .mintstage canvas{width:100%;height:100%;display:block}
+  .mintstage.shake{animation:shake .5s}
+  @keyframes shake{20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-3px)}60%{transform:translate(-3px,-2px)}80%{transform:translate(3px,3px)}}
+  .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+  .traits{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:12px}
+  .trait{border:2px solid var(--line);background:#000;padding:8px 10px;font-family:var(--term);font-size:18px}
+  .trait small{display:block;font-family:var(--pixel);font-size:8px;color:var(--muted);text-transform:uppercase}
+  .trait.r1{border-color:var(--line2)}.trait.r2{border-color:var(--green)}.trait.r3{border-color:#8ab4ff}.trait.r4{border-color:var(--pink)}.trait.r5{border-color:var(--yellow);box-shadow:0 0 14px rgba(255,210,63,.35)}
+  .rar{font-family:var(--pixel);font-size:12px;padding:6px 10px;border:3px solid;display:inline-block;margin-top:10px}
+  .num{font-family:var(--pixel);font-size:20px;color:var(--acid);text-shadow:2px 2px 0 #000}
+
+  /* market */
+  .carousel{display:flex;align-items:center;gap:10px}
+  .market{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 4px 14px;flex:1;min-width:0;scrollbar-color:var(--acid) #000;scrollbar-width:thin}
+  .market::-webkit-scrollbar{height:10px}.market::-webkit-scrollbar-track{background:#000;border:2px solid var(--line)}.market::-webkit-scrollbar-thumb{background:var(--acid);border:2px solid #000}
+  .market .item{flex:0 0 200px;scroll-snap-align:start}
+  .arrow{flex:none}
+  @media(max-width:640px){.arrow{display:none}}
+  .crowdwrap{margin-top:14px;border-block:3px solid var(--line);background:#000;overflow:hidden}
+  .crowdwrap canvas{width:100%;height:60px;display:block}
+  #bgc{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  #loader{position:fixed;inset:0;z-index:100;background:#06100a;display:grid;place-items:center;transition:opacity .5s}
+  #loader.out{opacity:0;pointer-events:none}
+  #loader::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 2px,transparent 2px 4px);pointer-events:none}
+  .lbox{display:grid;gap:14px;justify-items:center;position:relative;z-index:1}
+  .lbox canvas{width:168px;height:auto;filter:drop-shadow(0 0 24px rgba(184,255,61,.35))}
+  .lt{font-family:var(--pixel);font-weight:700;font-size:34px;color:var(--acid);text-shadow:3px 3px 0 #000}
+  .lbar{width:240px;height:12px;background:#000;border:3px solid var(--line2)}
+  .lbar i{display:block;height:100%;width:0;background:var(--acid);transition:width .12s linear}
+  .ls{font-family:var(--term);font-size:20px;color:var(--muted)}
+  .item{border:3px solid var(--line2);background:var(--panel);padding:12px;box-shadow:4px 4px 0 #000;display:grid;gap:8px;justify-items:start}
+  .item canvas{width:96px;height:auto;background:#000;border:2px solid var(--line)}
+  .item .n{font-family:var(--pixel);font-size:11px}
+  .item .r{font-family:var(--pixel);font-size:8px;text-transform:uppercase}
+  .item .p{font-family:var(--term);font-size:19px;color:var(--yellow)}
+  .item p{margin:0;color:var(--muted);font-size:13px}
+  .item.owned{border-color:var(--green)}
+  .item.eq{border-color:var(--acid);background:#10241a}
+
+  /* wardrobe / wall */
+  .wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+  .wcard{border:3px solid var(--line2);background:#000;padding:8px;display:grid;gap:6px;justify-items:center;cursor:pointer}
+  .wcard.on{border-color:var(--acid)}
+  .wcard canvas{width:100%;height:auto}
+  .wcard span{font-family:var(--term);font-size:16px;color:var(--muted)}
+  .empty{border:3px dashed var(--line2);padding:24px;text-align:center;font-family:var(--term);font-size:21px;color:var(--muted)}
+
+  .lore{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:800px){.lore{grid-template-columns:1fr}}
+  .lore div{border:3px solid var(--line2);background:var(--panel);padding:18px;box-shadow:5px 5px 0 #000;font-family:var(--term);font-size:22px;line-height:1.2}
+  .lore div b{display:block;font-family:var(--pixel);font-size:11px;color:var(--acid);margin-bottom:8px;text-transform:uppercase}
+  .tok{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:800px){.tok{grid-template-columns:1fr}}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-family:var(--term);font-size:21px}
+  .kv span:nth-child(odd){color:var(--muted)}
+  .flow{display:grid;gap:10px;margin-top:8px;font-family:var(--term);font-size:21px}
+  .flow div{display:flex;gap:12px;align-items:flex-start}
+  .flow i{font-style:normal;flex:none;width:28px;height:28px;display:grid;place-items:center;background:var(--acid);color:#06100a;font-family:var(--pixel);font-size:11px}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:900px){.steps{grid-template-columns:1fr 1fr}}@media(max-width:520px){.steps{grid-template-columns:1fr}}
+  .step{border:3px solid var(--line2);background:var(--panel);padding:16px;box-shadow:5px 5px 0 #000}
+  .step b{display:block;font-family:var(--pixel);font-size:12px;color:var(--acid);margin-bottom:6px}
+  .step p{margin:0;font-family:var(--term);font-size:20px;line-height:1.2;color:#cfe3d4}
+  details{border-top:3px solid var(--line);padding:14px 0}details:last-of-type{border-bottom:3px solid var(--line)}
+  summary{cursor:pointer;font-family:var(--term);font-size:23px;list-style:none;display:flex;justify-content:space-between}
+  summary::after{content:'+';color:var(--acid)}details[open] summary::after{content:'-'}
+  details p{color:var(--muted);margin:8px 0 0;max-width:68ch}
+  footer{margin-top:64px;padding-top:20px;border-top:3px solid var(--line);display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-family:var(--term);font-size:20px;color:var(--muted)}
+  footer a{text-decoration:none}footer a:hover{color:var(--text)}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--acid);color:#06100a;padding:10px 16px;font-family:var(--pixel);font-size:11px;text-transform:uppercase;border:3px solid #000;box-shadow:3px 3px 0 #000;transition:.2s;z-index:50;max-width:calc(100vw - 32px);text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:60}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="loader"><div class="lbox"><canvas id="lcv" width="24" height="26"></canvas><div class="lt">hoodie</div><div class="lbar"><i id="lfill"></i></div><div class="ls" id="ltxt">putting the hoodie on… 0%</div></div></div>
+<canvas id="bgc" aria-hidden="true"></canvas>
+<div class="wrap">
+<nav>
+  <a class="brand" href="#"><canvas id="navlogo" width="24" height="26" aria-hidden="true"></canvas>hoodie</a>
+  <div class="navlinks"><a href="#gen">Put it on</a><a href="#mint">Mint</a><a href="#market">Marketplace</a><a href="#wardrobe">Wardrobe</a><a href="#token">Token</a><a href="#buy">Buy</a><a href="#faq">FAQ</a></div>
+  <div class="cta">
+    <a class="mode" href="#faq" title="Mints and purchases are simulated until the contract is live" style="text-decoration:none">preview mode</a>
+    <div class="wallet" id="wallet" hidden><span class="e">Ξ <b id="balEth">0.000</b></span><span class="h"><b id="balHood">0</b> $HOODIE</span></div>
+    <button class="btn sm" id="connectBtn">Connect wallet</button>
+    <a class="btn sm acid" id="buyLink" href="#buy">Buy $HOODIE</a>
+  </div>
+</nav>
+<div class="tape"><div id="tape"></div></div>
+
+<div class="hero" id="gen">
+  <div>
+    <h1>HOODIE</h1>
+    <p class="tag">everyone in the hood wears one.</p>
+    <p class="lede">An empty green hoodie on Robinhood Chain. Nobody inside. Everybody inside. Mint your own, dress it from the marketplace, put it on your PFP. Hold $HOODIE and creator fees are paid to holders in ETH. The hoodie has pockets.</p>
+    <div class="badges"><span class="badge">Hold on RH</span><span class="badge y">Fees paid in ETH</span><span class="badge w">Nobody inside</span></div>
+    <div class="cta"><a class="btn acid" href="#mint">Mint a hoodie</a><button class="btn" id="scrollGen">Put the hoodie on →</button></div>
+    <div class="ca"><span>CA</span><b id="caText">drops at launch</b><button class="btn sm" id="copyCa">copy</button></div>
+    <div class="stats"><div><b id="stMint">0</b>hoodies minted here</div><div><b id="stItems">0</b>items in your closet</div><div><b id="stWear">0</b>PFPs dressed</div></div>
+  </div>
+
+  <div class="gen">
+    <div class="ph"><span>Put the hoodie on</span><span id="genState">no picture yet</span></div>
+    <div class="stage" id="stage">
+      <canvas id="out" width="1000" height="1000"></canvas>
+      <div class="drop" id="drop"><div><b>DROP YOUR PFP HERE</b>or click to choose a picture<small>your face shows through the hood · nothing is uploaded, it all runs in your browser</small></div></div>
+    </div>
+    <input type="file" id="file" accept="image/*" hidden>
+    <div class="ctrls">
+      <div class="ctrl"><span>Wearing</span><div class="toggles" id="wearSel"></div></div>
+      <div class="ctrl"><span>Hood size</span><input type="range" id="size" min="60" max="140" value="104"></div>
+      <div class="ctrl"><span>Face zoom</span><input type="range" id="zoom" min="50" max="250" value="100"></div>
+      <div class="ctrl"><span>Inside</span><div class="toggles"><button class="tg on" data-inside="face">your face</button><button class="tg" data-inside="nobody">nobody</button><button class="tg" data-inside="eyes">eyes only</button></div></div>
+    </div>
+    <div class="actions"><button class="btn acid" id="dl">Download PNG</button><button class="btn" id="tweet">Tweet it</button><button class="btn sm" id="reset">Reset</button></div>
+  </div>
+</div>
+
+<section id="mint">
+  <p class="eyebrow">Mint</p>
+  <h2>Mint your hoodie. It's empty until you wear it.</h2>
+  <p class="sub">Every hoodie is generated on mint: colour, pattern, strings, pocket, and what's inside the hood. Some come with something already on. 0.01 ETH per mint in preview mode — the real mint opens with the token.</p>
+  <div class="mint">
+    <div>
+      <div class="mintstage" id="mintstage"><canvas id="mintcv" width="480" height="520"></canvas><div class="flash" id="flash"></div></div>
+      <div class="actions" style="margin-top:12px"><button class="btn acid" id="mintBtn">Mint · Ξ 0.01</button><button class="btn" id="mintAgain" hidden>Mint another</button><button class="btn sm" id="wearMinted" hidden>Wear this one</button></div>
+    </div>
+    <div class="box">
+      <div class="ph"><span id="mintTitle">no hoodie yet</span><span class="num" id="mintNum"></span></div>
+      <div id="rarBox"></div>
+      <div class="traits" id="traits"><div class="trait r1"><small>colour</small>?</div><div class="trait r1"><small>pattern</small>?</div><div class="trait r1"><small>strings</small>?</div><div class="trait r1"><small>pocket</small>?</div><div class="trait r1"><small>inside</small>?</div><div class="trait r1"><small>drop</small>?</div></div>
+      <p class="sub" style="margin:14px 0 0;font-size:14px">Rarity is computed from the trait odds. Legendary hoodies exist. You will know.</p>
+    </div>
+  </div>
+</section>
+
+<section id="market">
+  <p class="eyebrow">Marketplace</p>
+  <h2>Dress the hoodie.</h2>
+  <p class="sub">Items cost Ξ 0.02–0.06 and go on whichever hoodie you're wearing — in the mint, in the wardrobe, and on your PFP. Buy, equip, unequip. Sell back at half. Item ETH goes to the holder pool.</p>
+  <div class="carousel"><button class="btn sm arrow" id="mPrev" aria-label="Previous">◀</button><div class="market" id="marketGrid"></div><button class="btn sm arrow" id="mNext" aria-label="Next">▶</button></div>
+  <div class="crowdwrap"><canvas id="crowd" height="60"></canvas></div>
+</section>
+
+<section id="wardrobe">
+  <p class="eyebrow">Wardrobe</p>
+  <h2>Your hoodies.</h2>
+  <p class="sub">Everything you've minted, saved in this browser. Click one to wear it.</p>
+  <div class="wall" id="wardrobeGrid"></div>
+</section>
+
+<section id="hood">
+  <p class="eyebrow">The hood</p>
+  <h2>Three rules of the hoodie.</h2>
+  <div class="lore">
+    <div><b>01 · nobody inside</b>The hoodie is empty. That's the point. It's whoever is holding. Put it on and you're in.</div>
+    <div><b>02 · the hood is the logo</b>Robinhood Chain is the hood. CASHCAT, Hoodrat, Little John — everybody's already wearing one. We just made it official.</div>
+    <div><b>03 · the hoodie has pockets</b>Every trade on the $HOODIE pool pays creator fees. Those fees go to holders. In ETH. Not in a token you have to sell.</div>
+  </div>
+</section>
+
+<section id="token">
+  <p class="eyebrow">Token</p>
+  <h2>$HOODIE</h2>
+  <div class="tok">
+    <div class="box"><div class="kv"><span>Ticker</span><span>$HOODIE</span><span>Chain</span><span>Robinhood Chain (Ethereum L2)</span><span>Pair</span><span>HOODIE / ETH · Uniswap V4</span><span>Supply</span><span>1,000,000,000 · no team allocation</span><span>Creator fee</span><span>paid to holders in ETH</span><span>Hoodie NFTs</span><span>mint Ξ 0.01 · items Ξ 0.02–0.06</span><span>Contract</span><span id="caText2" style="overflow-wrap:anywhere">drops at launch</span></div></div>
+    <div class="box"><p class="eyebrow" style="margin-bottom:10px">Where the fees go</p><div class="flow"><div><i>1</i>Someone trades $HOODIE on the pool</div><div><i>2</i>The pool takes the creator fee in ETH</div><div><i>3</i>ETH is streamed to $HOODIE holders, pro rata</div><div><i>4</i>Mint and marketplace ETH goes into the same holder pool. Buying a beanie pays the hood.</div></div></div>
+  </div>
+</section>
+
+<section id="buy">
+  <p class="eyebrow">How to buy</p>
+  <h2>Four steps. Wear a hoodie for the last one.</h2>
+  <div class="steps">
+    <div class="step"><b>1 · Wallet</b><p>Any EVM wallet (Rabby, MetaMask). Add Robinhood Chain — an Ethereum L2 on Arbitrum's Orbit stack.</p></div>
+    <div class="step"><b>2 · Bridge ETH</b><p>Bridge ETH from mainnet or Arbitrum to Robinhood Chain. Gas is cents.</p></div>
+    <div class="step"><b>3 · Swap</b><p>Open the $HOODIE pool on Uniswap V4 via the link on our X. Paste the CA. Swap ETH → HOODIE.</p></div>
+    <div class="step"><b>4 · Hold</b><p>Fees arrive in ETH while you hold. Mint a hoodie, dress it, put it on your PFP so the hood knows.</p></div>
+  </div>
+  <div class="cta" style="margin-top:16px"><a class="btn acid" id="buyLink2" href="#" target="_blank" rel="noopener">Open the pool</a><a class="btn" id="chartLink" href="#" target="_blank" rel="noopener">Chart</a><a class="btn" id="xLink" href="https://x.com/" target="_blank" rel="noopener">X</a></div>
+</section>
+
+<section id="faq">
+  <p class="eyebrow">FAQ</p>
+  <h2>Questions from inside the hoodie.</h2>
+  <details open><summary>Who is inside the hoodie?</summary><p>Nobody. Then you. The mascot is an empty hoodie by design — it's whoever is holding it. The dev is also a hoodie.</p></details>
+  <details><summary>Is the mint real right now?</summary><p>Not yet. The site is in preview mode: mints, purchases and the wallet are simulated in your browser so you can see exactly how it works. Your minted hoodies and items are saved locally. The on-chain mint and marketplace open with the token launch, announced on our X.</p></details>
+  <details><summary>Is the PFP generator uploading my picture?</summary><p>No. It runs entirely in your browser with a canvas. Nothing leaves your device. Download the PNG and set it as your PFP.</p></details>
+  <details><summary>How are fees paid in ETH?</summary><p>The $HOODIE pool charges a creator fee on trades, collected in ETH and distributed to holders proportionally. No claiming, staking or selling required.</p></details>
+  <details><summary>Where is the CA?</summary><p>Posted on our X at launch and shown at the top of this page. Any CA anywhere else before that is fake. The hoodie does not DM.</p></details>
+  <details><summary>Is this connected to Robinhood?</summary><p>No. It's a hoodie. Robinhood Chain is a public network; $HOODIE is a memecoin on it, not affiliated with Robinhood in any way.</p></details>
+</section>
+
+
+</div>
+<div class="toast" id="toast" role="status"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const CONFIG={x:'https://x.com/',pool:'https://app.uniswap.org/',chart:'https://dexscreener.com/',ca:''};
+if(CONFIG.ca){$('#caText').textContent=CONFIG.ca;$('#caText2').textContent=CONFIG.ca}
+$('#xLink').href=CONFIG.x;$('#buyLink2').href=CONFIG.pool;$('#chartLink').href=CONFIG.chart;
+[['#buyLink2','Pool link goes live with the CA — opening Uniswap'],['#chartLink','Chart goes live with the CA — opening DexScreener']].forEach(([id,m])=>$(id).addEventListener('click',()=>{if(!CONFIG.ca)toast(m)}));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2300)}
+const pick=a=>a[Math.random()*a.length|0];
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+
+/* ---------- confetti ---------- */
+const cc=$('#confetti'),cx=cc.getContext('2d');let parts=[];
+function burst(x,y,cols=['#b8ff3d','#22c55e','#ffd23f','#fff']){cc.width=innerWidth;cc.height=innerHeight;for(let i=0;i<90;i++)parts.push({x,y,vx:(Math.random()-.5)*16,vy:-Math.random()*13-4,g:.4,r:4+Math.random()*5,c:cols[i%cols.length],a:1});if(!burst._on){burst._on=true;(function step(){cx.clearRect(0,0,cc.width,cc.height);parts=parts.filter(p=>p.a>0);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.a-=.014;cx.globalAlpha=Math.max(0,p.a);cx.fillStyle=p.c;cx.fillRect(p.x,p.y,p.r,p.r)});if(parts.length)requestAnimationFrame(step);else{burst._on=false;cx.clearRect(0,0,cc.width,cc.height)}})()}}
+function burstAt(el){const r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2)}
+
+/* ---------- sprite + traits ---------- */
+const ROWS=['..........GGGG..........','.........GGGGGG.........','........GGGGGGGG........','.......GGGGGGGGGG.......','......GGGGGGGGGGGG......','.....GGGDDDDDDDDGGG.....','.....GGDHHHHHHHHDGG.....','....GGDHHHHHHHHHHDGG....','....GGDHHHHHHHHHHDGG....','....GGDHHEEHHHHEEDGG....','....GGDHHEEHHHHEEDGG....','....GGDHHHHHHHHHHDGG....','....GGDHHHHHHHHHHDGG....','.....GGDDHHHHHHDDGG.....','....GGGGGSDDDDSGGGGG....','...GGGGGGGSGGSGGGGGGG...','..GGGGGGGGGSGSGGGGGGGG..','..GGDGGGGGGGSGGGGGGGDGG.','..GGDGGGGGGGSGGGGGGGDGG.','..GGDGGGPPPPPPPPPGGGDGG.','..GGDGGGPGGGGGGGPGGGDGG.','..GGDGGGPGGGGGGGPGGGDGG.','..KKKGGGPPPPPPPPPGGGKKK.','.....GGGGGGGGGGGGGGG....','.....KKKKKKKKKKKKKKK....'];
+const COLORS={green:{G:'#22c55e',D:'#15803d',K:'#14532d',w:30},acid:{G:'#b8ff3d',D:'#7fbf1a',K:'#4f7a0f',w:16},black:{G:'#2a2f3a',D:'#1a1e26',K:'#0d1015',w:16},pink:{G:'#ff4fd8',D:'#b8309a',K:'#7a1f66',w:10},blue:{G:'#3b82f6',D:'#1d4ed8',K:'#1e3a8a',w:12},white:{G:'#e5e7eb',D:'#9ca3af',K:'#6b7280',w:8},purple:{G:'#a855f7',D:'#7e22ce',K:'#4c1d95',w:5},gold:{G:'#f5c542',D:'#c9982a',K:'#8a6a1a',w:2},void:{G:'#0a0a0a',D:'#000',K:'#000',w:1}};
+const PATTERNS={none:40,stripes:22,camo:16,pixels:12,checker:7,static:3};
+const STRINGS={white:50,black:22,gold:14,acid:10,pink:4};
+const POCKETS={kangaroo:55,none:25,zip:14,double:6};
+const INSIDES={nobody:40,eyes:35,'green glow':12,'red eyes':8,'gold eyes':4,'nothing at all':1};
+const DROPS={none:70,beanie:9,shades:9,chain:6,patch:4,halo:1.5,crown:0.5};
+const RARITY=[[0,'common','#8fb39a',1],[1.5,'uncommon','#22c55e',2],[3,'rare','#8ab4ff',3],[4.6,'epic','#ff4fd8',4],[6.2,'legendary','#ffd23f',5]];
+function wpick(tbl){const ks=Object.keys(tbl);const tot=ks.reduce((a,k)=>a+(tbl[k].w??tbl[k]),0);let r=Math.random()*tot;for(const k of ks){r-=(tbl[k].w??tbl[k]);if(r<=0)return k}return ks[0]}
+function odds(tbl,k){const tot=Object.keys(tbl).reduce((a,x)=>a+(tbl[x].w??tbl[x]),0);return (tbl[k].w??tbl[k])/tot}
+function rarityScore(h){let s=0;[[COLORS,h.color],[PATTERNS,h.pattern],[STRINGS,h.strings],[POCKETS,h.pocket],[INSIDES,h.inside],[DROPS,h.drop]].forEach(([t,k])=>{s+=Math.log(1/odds(t,k))});return s-3.6}
+function rarityOf(h){const s=rarityScore(h);let r=RARITY[0];RARITY.forEach(x=>{if(s>=x[0])r=x});return r}
+// items (marketplace) drawn as overlays
+const ITEMS={
+  beanie:{n:'Beanie',p:0.02,r:'common',d:'Keeps the hood warm. The hood is already warm.',draw:(c,x,y,px,col)=>{c.fillStyle=col||'#c33';[[9,0,6,1],[8,1,8,1],[7,2,10,1],[6,3,12,1],[6,4,12,1]].forEach(([cx,cy,w,h])=>c.fillRect(x+cx*px,y+cy*px,w*px,h*px));c.fillStyle='#fff';c.fillRect(x+11*px,y-px,2*px,px)}},
+  shades:{n:'Shades',p:0.025,r:'uncommon',d:'So nobody can tell there is nobody inside.',draw:(c,x,y,px)=>{c.fillStyle='#111';c.fillRect(x+8*px,y+9*px,3*px,2*px);c.fillRect(x+13*px,y+9*px,3*px,2*px);c.fillRect(x+11*px,y+9*px,2*px,px);c.fillStyle='#4cf0ff';c.fillRect(x+9*px,y+9*px,px,px);c.fillRect(x+14*px,y+9*px,px,px)}},
+  chain:{n:'Gold chain',p:0.04,r:'rare',d:'Pockets have pockets now.',draw:(c,x,y,px)=>{c.fillStyle='#f5c542';[[8,14],[7,15],[7,16],[8,17],[9,18],[10,18],[13,18],[14,18],[15,17],[16,16],[16,15],[15,14]].forEach(([cx,cy])=>c.fillRect(x+cx*px,y+cy*px,px,px));c.fillRect(x+11*px,y+19*px,2*px,2*px)}},
+  patch:{n:'$HOODIE patch',p:0.02,r:'common',d:'Sewn on. Says what it is.',draw:(c,x,y,px)=>{c.fillStyle='#000';c.fillRect(x+16*px,y+15*px,4*px,3*px);c.fillStyle='#b8ff3d';c.fillRect(x+17*px,y+16*px,2*px,px)}},
+  headphones:{n:'Headphones',p:0.03,r:'uncommon',d:'Listening to the chart.',draw:(c,x,y,px)=>{c.fillStyle='#222';c.fillRect(x+4*px,y+8*px,2*px,4*px);c.fillRect(x+18*px,y+8*px,2*px,4*px);c.fillRect(x+5*px,y+4*px,14*px,px);c.fillRect(x+4*px,y+5*px,px,3*px);c.fillRect(x+19*px,y+5*px,px,3*px);c.fillStyle='#b8ff3d';c.fillRect(x+4*px,y+9*px,px,2*px);c.fillRect(x+19*px,y+9*px,px,2*px)}},
+  halo:{n:'Halo',p:0.055,r:'epic',d:'The dev did nothing wrong.',draw:(c,x,y,px)=>{c.fillStyle='#ffd23f';c.fillRect(x+8*px,y-2*px,8*px,px);c.fillRect(x+7*px,y-px,px,px);c.fillRect(x+16*px,y-px,px,px);c.fillRect(x+8*px,y,8*px,px*0.4)}},
+  crown:{n:'Crown',p:0.06,r:'legendary',d:'King of an empty hoodie.',draw:(c,x,y,px)=>{c.fillStyle='#f5c542';c.fillRect(x+7*px,y-px,10*px,2*px);[[7,-3],[10,-3],[13,-3],[16,-3]].forEach(([cx,cy])=>c.fillRect(x+cx*px,y+cy*px,px,2*px));c.fillStyle='#ff4fd8';c.fillRect(x+11*px,y-px,2*px,px)}},
+  wings:{n:'Pixel wings',p:0.05,r:'epic',d:'It still cannot fly. It is a hoodie.',draw:(c,x,y,px)=>{c.fillStyle='#e5e7eb';[[0,14,3,1],[-1,15,4,1],[-2,16,5,1],[-1,17,4,1],[0,18,3,1],[21,14,3,1],[21,15,4,1],[21,16,5,1],[21,17,4,1],[21,18,3,1]].forEach(([cx,cy,w,h])=>c.fillRect(x+cx*px,y+cy*px,w*px,h*px))}},
+  mask:{n:'Ski mask',p:0.035,r:'rare',d:'Robin hood energy.',draw:(c,x,y,px)=>{c.fillStyle='#111';c.fillRect(x+7*px,y+6*px,10*px,8*px);c.fillStyle='#fff';c.fillRect(x+9*px,y+9*px,2*px,px);c.fillRect(x+13*px,y+9*px,2*px,px)}},
+};
+const RCOL={common:'#8fb39a',uncommon:'#22c55e',rare:'#8ab4ff',epic:'#ff4fd8',legendary:'#ffd23f'};
+
+function drawHoodie(ctx,x,y,px,h,opts={}){
+  const col=COLORS[h.color]||COLORS.green;const inside=opts.inside||h.inside;
+  const eq=(h.items||[]);
+  // items behind (wings)
+  if(eq.includes('wings'))ITEMS.wings.draw(ctx,x,y,px);
+  for(let r=0;r<ROWS.length;r++)for(let c=0;c<24;c++){let ch=ROWS[r][c];if(ch==='.')continue;
+    if(ch==='P'){if(h.pocket==='none')ch='G';else if(h.pocket==='zip'){ch=(r===19||r===22)?'G':(c===11||c===12)?'S':'G'}else if(h.pocket==='double'){ch=(c===11||c===12)?'D':ch==='P'?'D':ch}else ch='D'}
+    if(ch==='H'||ch==='E'){
+      if(inside==='face')continue;
+      let fill='#050a06';
+      if(ch==='E'){if(inside==='eyes')fill='#fff';else if(inside==='green glow')fill='#b8ff3d';else if(inside==='red eyes')fill='#ff3b3b';else if(inside==='gold eyes')fill='#ffd23f';else if(inside==='nothing at all')fill='#050a06'}
+      if(inside==='nothing at all')fill='#000';
+      ctx.fillStyle=fill;ctx.fillRect(x+c*px,y+r*px,px,px);continue}
+    let fill=ch==='S'?({white:'#e5e7eb',black:'#111',gold:'#f5c542',acid:'#b8ff3d',pink:'#ff4fd8'}[h.strings]||'#e5e7eb'):col[ch];
+    if((ch==='G')&&h.pattern!=='none'){const p=h.pattern;if(p==='stripes'&&r%4===1)fill=col.D;if(p==='camo'&&((r*7+c*3)%11<3))fill=col.K;if(p==='pixels'&&((r*13+c*7)%9===0))fill=col.D;if(p==='checker'&&((r+c)%2===0)&&r>13)fill=col.D;if(p==='static'&&Math.random()<.25)fill=col.D}
+    ctx.fillStyle=fill;ctx.fillRect(x+c*px,y+r*px,px,px)}
+  if(inside==='eyes'||inside==='green glow'||inside==='red eyes'||inside==='gold eyes'){const g={eyes:'#fff','green glow':'#b8ff3d','red eyes':'#ff3b3b','gold eyes':'#ffd23f'}[inside];ctx.save();ctx.shadowColor=g;ctx.shadowBlur=px*1.6;ctx.fillStyle=g;[[9,9],[15,9]].forEach(([cx,cy])=>ctx.fillRect(x+cx*px,y+cy*px,2*px,2*px));ctx.restore()}
+  // items front
+  ['mask','shades','headphones','chain','patch','beanie','halo','crown'].forEach(k=>{if(eq.includes(k))ITEMS[k].draw(ctx,x,y,px,k==='beanie'?(h.beanieCol||'#c33'):undefined)});
+}
+function newHoodie(){const h={color:wpick(COLORS),pattern:wpick(PATTERNS),strings:wpick(STRINGS),pocket:wpick(POCKETS),inside:wpick(INSIDES),drop:wpick(DROPS),items:[],beanieCol:pick(['#c33','#3b82f6','#111','#b8ff3d','#ff4fd8'])};if(h.drop!=='none')h.items.push(h.drop);return h}
+
+/* ---------- state ---------- */
+const KEY='hoodie-app-v1';
+let state={connected:false,addr:'',eth:0,hood:0,minted:[],owned:[],wearing:null,dressed:0,nextNum:1};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.minted)state={...state,...s}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function wearing(){return state.minted.find(h=>h.num===state.wearing)||null}
+function renderWallet(){$('#balEth').textContent=state.eth.toFixed(3);$('#balHood').textContent=fmt(state.hood);$('#connectBtn').textContent=state.connected?state.addr:'Connect wallet';const w=$('#wallet');w.classList.remove('pop');void w.offsetWidth;w.classList.add('pop');$('#stMint').textContent=state.minted.length;$('#stItems').textContent=state.owned.length;$('#stWear').textContent=state.dressed}
+function needWallet(){if(!state.connected){toast('Connect a wallet first');$('#connectBtn').scrollIntoView({block:'center'});return true}return false}
+$('#connectBtn').addEventListener('click',()=>{if(state.connected){state.connected=false;renderWallet();save();toast('Wallet disconnected');return}const a='0123456789abcdef';let s='0x';for(let i=0;i<6;i++)s+=a[Math.random()*16|0];state.addr=s+'…'+a[Math.random()*16|0]+a[Math.random()*16|0];state.connected=true;if(state.eth===0&&state.hood===0){state.eth=0.5;state.hood=250000;toast('Preview wallet: Ξ 0.500 + 250,000 $HOODIE loaded')}else toast('Wallet connected');renderWallet();save();burstAt($('#wallet'))});
+
+/* ---------- mint ---------- */
+const mcv=$('#mintcv'),mctx=mcv.getContext('2d');let current=null,rolling=false;
+function drawMintStage(h,label){mctx.fillStyle='#06100a';mctx.fillRect(0,0,480,520);mctx.fillStyle='rgba(34,197,94,.06)';for(let i=0;i<480;i+=40)mctx.fillRect(i,0,2,520);for(let i=0;i<520;i+=40)mctx.fillRect(0,i,480,2);const g=mctx.createRadialGradient(240,250,0,240,250,300);g.addColorStop(0,'rgba(184,255,61,.18)');g.addColorStop(1,'rgba(0,0,0,0)');mctx.fillStyle=g;mctx.fillRect(0,0,480,520);
+  if(h)drawHoodie(mctx,48,52,16,h);else{mctx.fillStyle='#1d3a27';mctx.font='700 18px Silkscreen';mctx.textAlign='center';mctx.fillText('?',240,270);mctx.textAlign='left'}
+  if(label){mctx.fillStyle='rgba(0,0,0,.6)';mctx.fillRect(0,480,480,40);mctx.font='700 14px Silkscreen';mctx.fillStyle='#b8ff3d';mctx.textAlign='center';mctx.fillText(label,240,506);mctx.textAlign='left'}}
+function renderTraits(h){const r=rarityOf(h);const tr=[['colour',h.color,COLORS],['pattern',h.pattern,PATTERNS],['strings',h.strings,STRINGS],['pocket',h.pocket,POCKETS],['inside',h.inside,INSIDES],['drop',h.drop,DROPS]];
+  $('#traits').innerHTML=tr.map(([n,v,t])=>{const o=odds(t,v);const lvl=o<.03?5:o<.08?4:o<.15?3:o<.3?2:1;return `<div class="trait r${lvl}"><small>${n} · ${(o*100).toFixed(o<.01?1:0)}%</small>${v}</div>`}).join('');
+  $('#rarBox').innerHTML=`<span class="rar" style="border-color:${r[2]};color:${r[2]}">${r[1].toUpperCase()} · score ${rarityScore(h).toFixed(1)}</span>`;
+  $('#mintTitle').textContent='hoodie #'+h.num;$('#mintNum').textContent='#'+String(h.num).padStart(4,'0')}
+$('#mintBtn').addEventListener('click',()=>{if(rolling)return;if(needWallet())return;if(state.eth<0.01){state.eth+=0.25;renderWallet();toast('Preview wallet topped up: +Ξ 0.25');}
+  rolling=true;state.eth-=0.01;renderWallet();const target=newHoodie();let i=0;const n=22;
+  (function roll(){if(i<n){drawMintStage(newHoodie(),'minting…');i++;setTimeout(roll,35+i*8)}else{
+    target.num=state.nextNum++;state.minted.unshift(target);current=target;state.wearing=target.num;
+    const st=$('#mintstage');st.classList.remove('shake');void st.offsetWidth;st.classList.add('shake');const f=$('#flash');f.style.transition='none';f.style.opacity=.9;setTimeout(()=>{f.style.transition='opacity .6s';f.style.opacity=0},30);
+    drawMintStage(target,'hoodie #'+target.num);renderTraits(target);const r=rarityOf(target);
+    burstAt(st);if(r[3]>=4)setTimeout(()=>burstAt(st),300);toast(r[3]>=4?`${r[1].toUpperCase()} HOODIE. Screenshot this.`:`Minted hoodie #${target.num} · ${r[1]}`);
+    $('#mintBtn').hidden=true;$('#mintAgain').hidden=false;$('#wearMinted').hidden=false;rolling=false;renderAll()}})()});
+$('#mintAgain').addEventListener('click',()=>{$('#mintBtn').hidden=false;$('#mintAgain').hidden=true;$('#wearMinted').hidden=true;$('#mintBtn').click()});
+$('#wearMinted').addEventListener('click',()=>{if(current){state.wearing=current.num;renderAll();render();toast('Wearing hoodie #'+current.num);$('#stage').scrollIntoView({behavior:'smooth',block:'center'})}});
+
+/* ---------- marketplace ---------- */
+function renderMarket(){const w=wearing();$('#marketGrid').innerHTML=Object.entries(ITEMS).map(([k,it])=>{const owned=state.owned.includes(k),eq=w&&w.items.includes(k);
+  return `<div class="item ${owned?'owned':''} ${eq?'eq':''}"><canvas width="24" height="28" data-item="${k}"></canvas><div class="n">${it.n}</div><div class="r" style="color:${RCOL[it.r]}">${it.r}</div><p>${it.d}</p><div class="p">Ξ ${it.p.toFixed(3)}</div><div class="actions">${owned?`<button class="btn xs ${eq?'':'acid'}" data-eq="${k}">${eq?'Unequip':'Equip'}</button><button class="btn xs" data-sell="${k}">Sell ½</button>`:`<button class="btn xs acid" data-buy="${k}">Buy</button>`}</div></div>`}).join('');
+  document.querySelectorAll('#marketGrid canvas').forEach(c=>{const g=c.getContext('2d');g.fillStyle='#000';g.fillRect(0,0,24,28);drawHoodie(g,0,3,1,{color:'green',pattern:'none',strings:'white',pocket:'kangaroo',inside:'eyes',items:[c.dataset.item]})})}
+$('#marketGrid').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.buy){if(needWallet())return;const it=ITEMS[b.dataset.buy];if(state.eth<it.p){toast(`Need Ξ ${it.p.toFixed(3)} — connect or top up`);return}state.eth-=it.p;state.owned.push(b.dataset.buy);const w=wearing();if(w&&!w.items.includes(b.dataset.buy))w.items.push(b.dataset.buy);burstAt(b);toast(`Bought ${it.n} for Ξ ${it.p.toFixed(3)}${w?' · equipped':''}`)}
+  if(b.dataset.eq){const w=wearing();if(!w){toast('Mint a hoodie first');return}const k=b.dataset.eq;if(w.items.includes(k))w.items=w.items.filter(x=>x!==k);else w.items.push(k);toast(w.items.includes(k)?'Equipped':'Unequipped')}
+  if(b.dataset.sell){const k=b.dataset.sell;state.owned=state.owned.filter(x=>x!==k);state.minted.forEach(h=>h.items=h.items.filter(x=>x!==k||h.drop===k));state.eth+=ITEMS[k].p/2;toast(`Sold ${ITEMS[k].n} for Ξ ${(ITEMS[k].p/2).toFixed(3)}`)}
+  renderAll();render()});
+
+/* ---------- wardrobe ---------- */
+function renderWardrobe(){const g=$('#wardrobeGrid');if(!state.minted.length){g.innerHTML='<div class="empty" style="grid-column:1/-1">no hoodies yet. mint one above.</div>';return}
+  g.innerHTML=state.minted.map(h=>{const r=rarityOf(h);return `<div class="wcard ${state.wearing===h.num?'on':''}" data-w="${h.num}"><canvas width="24" height="30"></canvas><span style="color:${r[2]}">#${h.num} · ${r[1]}</span></div>`}).join('');
+  [...g.querySelectorAll('.wcard')].forEach((el,i)=>{const c=el.querySelector('canvas').getContext('2d');c.fillStyle='#000';c.fillRect(0,0,24,30);drawHoodie(c,0,4,1,state.minted[i])})}
+$('#wardrobeGrid').addEventListener('click',e=>{const el=e.target.closest('.wcard');if(!el)return;state.wearing=+el.dataset.w;const h=wearing();current=h;drawMintStage(h,'hoodie #'+h.num);renderTraits(h);renderAll();render();toast('Wearing hoodie #'+h.num)});
+
+/* ---------- PFP generator ---------- */
+const cv=$('#out'),ctx=cv.getContext('2d');
+const st={img:null,size:104,zoom:100,ox:0,oy:0,inside:'face',wear:'mine'};
+function bg(c,w,h){c.fillStyle='#07120a';c.fillRect(0,0,w,h);c.fillStyle='rgba(34,197,94,.06)';for(let x=0;x<w;x+=40)c.fillRect(x,0,2,h);for(let y=0;y<h;y+=40)c.fillRect(0,y,w,2);const g=c.createRadialGradient(w/2,h/2,0,w/2,h/2,w*.6);g.addColorStop(0,'rgba(34,197,94,.22)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(0,0,w,h)}
+const BASIC={color:'green',pattern:'none',strings:'white',pocket:'kangaroo',inside:'eyes',items:[]};
+function currentHoodie(){if(st.wear==='mine'&&wearing())return wearing();if(st.wear==='mine')return BASIC;return {...BASIC,color:st.wear}}
+function render(){
+  bg(ctx,1000,1000);const h=currentHoodie();
+  const px=Math.round(1000/24*st.size/100);const W=24*px,H=25*px;const hx=Math.round((1000-W)/2),hy=Math.round((1000-H)/2)+px;
+  const inside=st.img?st.inside:(st.inside==='face'?'eyes':st.inside);
+  if(st.img&&inside==='face'){
+    ctx.save();ctx.beginPath();for(let r=0;r<ROWS.length;r++)for(let c=0;c<24;c++){if(ROWS[r][c]==='H'||ROWS[r][c]==='E')ctx.rect(hx+c*px,hy+r*px,px,px)}ctx.clip();
+    const im=st.img;const cx=hx+12*px,cy=hy+10*px;const scale=(10*px/Math.min(im.width,im.height))*st.zoom/100;const dw=im.width*scale,dh=im.height*scale;ctx.imageSmoothingEnabled=true;ctx.drawImage(im,cx-dw/2+st.ox,cy-dh/2+st.oy,dw,dh);
+    const g=ctx.createRadialGradient(hx+12*px,hy+10*px,px*3,hx+12*px,hy+10*px,px*7);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.55)');ctx.fillStyle=g;ctx.fillRect(0,0,1000,1000);ctx.restore()}
+  drawHoodie(ctx,hx,hy,px,h,{inside});
+  ctx.font='700 22px Silkscreen';ctx.fillStyle='rgba(184,255,61,.6)';ctx.textAlign='right';ctx.fillText(h.num?'$HOODIE #'+h.num:'$HOODIE',980,975);ctx.textAlign='left';
+  $('#genState').textContent=st.img?(h.num?'wearing hoodie #'+h.num:'looking good'):'no picture yet';
+  renderWearSel()}
+function renderWearSel(){const w=wearing();const opts=[['mine',w?'my hoodie #'+w.num:'basic green'],['acid','acid'],['black','black'],['pink','pink'],['blue','blue'],['white','white']];$('#wearSel').innerHTML=opts.map(([k,l])=>`<button class="tg ${st.wear===k?'on':''}" data-wear="${k}">${l}</button>`).join('')}
+$('#wearSel').addEventListener('click',e=>{const b=e.target.closest('[data-wear]');if(!b)return;st.wear=b.dataset.wear;render()});
+function load(file){if(!file||!file.type.startsWith('image/')){toast('That is not a picture');return}const r=new FileReader();r.onload=e=>{const im=new Image();im.onload=()=>{st.img=im;st.ox=0;st.oy=0;$('#drop').hidden=true;state.dressed++;save();renderWallet();render();toast('Hoodie on. Drag to reposition, scroll to zoom.')};im.src=e.target.result};r.readAsDataURL(file)}
+$('#drop').addEventListener('click',()=>$('#file').click());$('#file').addEventListener('change',e=>load(e.target.files[0]));
+const stage=$('#stage');['dragenter','dragover'].forEach(ev=>stage.addEventListener(ev,e=>{e.preventDefault();$('#drop').classList.add('over')}));['dragleave','drop'].forEach(ev=>stage.addEventListener(ev,e=>{e.preventDefault();$('#drop').classList.remove('over')}));stage.addEventListener('drop',e=>load(e.dataTransfer.files[0]));
+document.addEventListener('paste',e=>{const f=[...(e.clipboardData?.files||[])][0];if(f)load(f)});
+let drag=null;stage.addEventListener('pointerdown',e=>{if(!st.img)return;drag={x:e.clientX,y:e.clientY,ox:st.ox,oy:st.oy};stage.setPointerCapture(e.pointerId)});
+stage.addEventListener('pointermove',e=>{if(!drag)return;const r=stage.getBoundingClientRect();const k=1000/r.width;st.ox=drag.ox+(e.clientX-drag.x)*k;st.oy=drag.oy+(e.clientY-drag.y)*k;render()});
+stage.addEventListener('pointerup',()=>drag=null);
+stage.addEventListener('wheel',e=>{if(!st.img)return;e.preventDefault();st.zoom=Math.max(50,Math.min(250,st.zoom-Math.sign(e.deltaY)*5));$('#zoom').value=st.zoom;render()},{passive:false});
+$('#size').addEventListener('input',e=>{st.size=+e.target.value;render()});$('#zoom').addEventListener('input',e=>{st.zoom=+e.target.value;render()});
+document.querySelectorAll('[data-inside]').forEach(b=>b.addEventListener('click',()=>{st.inside=b.dataset.inside;document.querySelectorAll('[data-inside]').forEach(x=>x.classList.toggle('on',x===b));render()}));
+$('#dl').addEventListener('click',()=>{const a=document.createElement('a');a.download='hoodie-pfp.png';a.href=cv.toDataURL('image/png');a.click();toast('Saved. Now set it as your PFP.')});
+$('#tweet').addEventListener('click',()=>{const w=wearing();const t=encodeURIComponent(`put the hoodie on. nobody inside. everybody inside.${w?` wearing hoodie #${w.num} (${rarityOf(w)[1]}).`:''}\n\n$HOODIE 🟢 `+location.origin);window.open('https://x.com/intent/tweet?text='+t,'_blank')});
+$('#reset').addEventListener('click',()=>{st.img=null;st.ox=st.oy=0;st.zoom=100;$('#zoom').value=100;$('#drop').hidden=false;render()});
+$('#scrollGen').addEventListener('click',()=>{$('#stage').scrollIntoView({behavior:'smooth',block:'center'});$('#file').click()});
+$('#copyCa').addEventListener('click',()=>{const t=$('#caText').textContent;if(t.startsWith('drops')){toast('CA drops at launch — follow our X');return}navigator.clipboard?.writeText(t).then(()=>toast('CA copied'))});
+
+function renderAll(){renderWallet();renderMarket();renderWardrobe();save()}
+$('#tape').innerHTML=Array(2).fill('$HOODIE · robinhood chain · nobody inside · everybody inside · mint a hoodie · dress it · wear it · the hoodie has pockets · ').map(s=>`<span>${s}</span>`).join('');
+renderAll();render();
+// loading screen: the hoodie zips up row by row
+(function(){const c=$('#lcv'),g=c.getContext('2d');const h={color:'green',pattern:'none',strings:'white',pocket:'kangaroo',inside:'eyes',items:[]};const t0=performance.now(),dur=matchMedia('(prefers-reduced-motion: reduce)').matches?300:1600;
+  function step(now){const p=Math.min(1,(now-t0)/dur);g.clearRect(0,0,24,26);g.save();g.beginPath();g.rect(0,26-Math.ceil(26*p),24,Math.ceil(26*p));g.clip();drawHoodie(g,0,0,1,h);g.restore();
+    $('#lfill').style.width=(p*100)+'%';$('#ltxt').textContent=p<1?`putting the hoodie on… ${Math.floor(p*100)}%`:'nobody inside. everybody inside.';
+    if(p<1)requestAnimationFrame(step);else setTimeout(()=>{$('#loader').classList.add('out');setTimeout(()=>$('#loader').remove(),600)},350)}
+  requestAnimationFrame(step);setTimeout(()=>{const l=$('#loader');if(l){l.classList.add('out');setTimeout(()=>l.remove(),600)}},5000)})();
+// nav logo
+(function(){const g=$('#navlogo').getContext('2d');drawHoodie(g,0,0,1,{color:'green',pattern:'none',strings:'white',pocket:'kangaroo',inside:'eyes',items:[]})})();
+// carousel arrows
+$('#mPrev').addEventListener('click',()=>$('#marketGrid').scrollBy({left:-424,behavior:'smooth'}));
+$('#mNext').addEventListener('click',()=>$('#marketGrid').scrollBy({left:424,behavior:'smooth'}));
+// crowd strip: a walking parade of random hoodies
+(function(){const c=$('#crowd'),g=c.getContext('2d');const cols=Object.keys(COLORS);const crowd=[];for(let i=0;i<40;i++)crowd.push({x:i*70,h:{...newHoodie(),items:Math.random()<.4?[pick(Object.keys(ITEMS))]:[]},bob:Math.random()*6.28});
+  function fit(){c.width=c.clientWidth||1200}addEventListener('resize',fit);fit();
+  (function step(t){g.fillStyle='#000';g.fillRect(0,0,c.width,60);crowd.forEach(p=>{p.x-=0.35;if(p.x<-60)p.x=c.width+10;const bob=Math.sin(t/300+p.bob)>0?1:0;drawHoodie(g,p.x,8+bob,2,p.h)});requestAnimationFrame(step)})(0)})();
+// living background: drifting hoodies + particles + moving grid
+(function(){const c=$('#bgc'),g=c.getContext('2d');let W,H,ps=[],hs=[];const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function size(){W=c.width=innerWidth;H=c.height=innerHeight;ps=Array.from({length:Math.min(90,W*H/14000|0)},()=>({x:Math.random()*W,y:Math.random()*H,r:1+Math.random()*2,v:.15+Math.random()*.35,a:.2+Math.random()*.5}));hs=Array.from({length:7},()=>({x:Math.random()*W,y:Math.random()*H,v:.12+Math.random()*.2,px:3+Math.random()*3,h:newHoodie(),ph:Math.random()*6}))}
+  addEventListener('resize',size);size();let mx=-1,my=-1;addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY},{passive:true});
+  function frame(t){g.fillStyle='#06100a';g.fillRect(0,0,W,H);
+    const off=(t/60)%40;g.fillStyle='rgba(34,197,94,.055)';for(let x=-off;x<W;x+=40)g.fillRect(x,0,2,H);for(let y=-off;y<H;y+=40)g.fillRect(0,y,W,2);
+    const glow=g.createRadialGradient(W*.5+Math.sin(t/4000)*W*.2,H*.4+Math.cos(t/5000)*H*.2,0,W*.5,H*.4,W*.7);glow.addColorStop(0,'rgba(184,255,61,.10)');glow.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=glow;g.fillRect(0,0,W,H);
+    if(mx>=0){const m=g.createRadialGradient(mx,my,0,mx,my,260);m.addColorStop(0,'rgba(34,197,94,.14)');m.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=m;g.fillRect(0,0,W,H)}
+    g.globalAlpha=.16;hs.forEach(h=>{h.y-=h.v;h.x+=Math.sin(t/1800+h.ph)*.2;if(h.y<-160){h.y=H+40;h.x=Math.random()*W;h.h=newHoodie()}drawHoodie(g,h.x,h.y,h.px,h.h)});g.globalAlpha=1;
+    ps.forEach(p=>{p.y-=p.v;if(p.y<-4){p.y=H+4;p.x=Math.random()*W}const d=mx>=0?Math.hypot(p.x-mx,p.y-my):999;g.fillStyle=`rgba(184,255,61,${Math.min(1,p.a+(d<200?(200-d)/200*.6:0))})`;g.fillRect(p.x,p.y,p.r,p.r)});
+    if(!reduce)requestAnimationFrame(frame)}
+  requestAnimationFrame(frame)})();
+const w0=wearing();if(w0){current=w0;drawMintStage(w0,'hoodie #'+w0.num);renderTraits(w0);$('#mintBtn').hidden=true;$('#mintAgain').hidden=false;$('#wearMinted').hidden=false}else drawMintStage(null,'press mint');
+})();
+</script>
+</body>
+</html>
